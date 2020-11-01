@@ -1,10 +1,13 @@
 package lesson1
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.assertThrows
 import util.PerfResult
 import util.estimate
 import java.io.BufferedWriter
 import java.io.File
+import java.time.format.DateTimeParseException
 import java.util.*
 import kotlin.math.abs
 import kotlin.system.measureNanoTime
@@ -42,6 +45,13 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         try {
             sortTimes("input/time_in3.txt", "temp.txt")
             assertFileContent("temp.txt", File("input/time_out3.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+        try {
+            assertThrows<DateTimeParseException> {
+                sortTimes("input/time_in4.txt", "temp.txt");
+            }
         } finally {
             File("temp.txt").delete()
         }
@@ -323,9 +333,9 @@ abstract class AbstractTaskTests : AbstractFileTests() {
     }
 
     protected fun mergeArrays(mergeArrays: (Array<Int>, Array<Int?>) -> Unit) {
-        val result = arrayOf(null, null, null, null, null, 1, 3, 9, 13, 18, 23)
-        mergeArrays(arrayOf(4, 9, 15, 20, 23), result)
-        assertArrayEquals(arrayOf(1, 3, 4, 9, 9, 13, 15, 18, 20, 23, 23), result)
+        val result = arrayOf(null, null, null, null, 1, 3, 9, 13, 18, 23)
+        mergeArrays(arrayOf(4, 15, 20, 23), result)
+        assertArrayEquals(arrayOf(1, 3, 4, 9, 13, 15, 18, 20, 23, 23), result)
 
         fun testGeneratedArrays(
             firstSize: Int,

@@ -154,9 +154,10 @@ abstract class AbstractBinarySearchTreeTest {
                 expectedSize, binarySet.size,
                 "The size of the tree is incorrect: was ${binarySet.size}, should've been $expectedSize."
             )
+
             for (element in controlSet) {
-                assertTrue(
-                    binarySet.contains(element),
+                assertFalse(
+                    !binarySet.contains(element),
                     "The tree doesn't have the element $element from the control set."
                 )
             }

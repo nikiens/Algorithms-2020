@@ -2,6 +2,12 @@ package lesson2;
 
 import kotlin.NotImplementedError;
 import kotlin.Pair;
+import kotlin.ranges.IntRange;
+
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.IntStream;
 
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
@@ -98,7 +104,7 @@ public class JavaAlgorithms {
      * вернуть ту из них, которая встречается раньше в строке first.
      */
     static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+       throw new NotImplementedError();
     }
 
     /**
@@ -111,7 +117,17 @@ public class JavaAlgorithms {
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
      */
+
+    /*
+     * Perf: Worst/Avg/Best - O(nlog(logn)
+     * Space O(n)
+     */
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        BitSet sieve = new BitSet(limit + 1);
+
+        return (int) IntStream.rangeClosed(2, limit).filter(i -> !sieve.get(i)).peek(n -> {
+            if (n*n <= limit)
+                for(int i = n; i <= limit; i+=n) sieve.set(i);
+        }).count();
     }
 }
