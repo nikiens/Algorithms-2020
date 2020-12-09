@@ -1,7 +1,7 @@
 package lesson4;
 
 import java.util.*;
-import kotlin.NotImplementedError;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,9 +12,13 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
     private static class Node {
         Map<Character, Node> children = new LinkedHashMap<>();
+
+        private boolean formsString() {
+            return children.containsKey((char) 0);
+        }
     }
 
-    private Node root = new Node();
+    private final Node root = new Node();
 
     private int size = 0;
 
@@ -84,16 +88,84 @@ public class Trie extends AbstractSet<String> implements Set<String> {
 
     /**
      * Итератор для префиксного дерева
-     *
+     * <p>
      * Спецификация: {@link Iterator} (Ctrl+Click по Iterator)
-     *
+     * <p>
      * Сложная
      */
     @NotNull
     @Override
     public Iterator<String> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new TrieIterator();
     }
 
+    private final class TrieIterator implements Iterator<String> {
+        private final Deque<Iterator<Map.Entry<Character, Node>>> nodes = new ArrayDeque<>();
+        private final StringBuilder buf = new StringBuilder();
+
+        private String nextString;
+        private Node current;
+
+        private TrieIterator() {
+            nodes.push(root.children.entrySet().iterator());
+        }
+
+        private boolean advanceToNextString() {
+            while (!nodes.isEmpty()) {
+                buf.setLength(nodes.size() - 1);
+
+                while (nodes.getFirst().hasNext()) {
+                    Map.Entry<Character, Node> next = nodes.getFirst().next();
+                    if (next.getKey().equals('\0')) {
+                        continue;
+                    }
+
+                    buf.append(next.getKey());
+
+                    if (!next.getValue().formsString()) {
+                        nodes.push(next.getValue().children.entrySet().iterator());
+                    } else {
+                        nextString = buf.toString();
+
+                        if (next.getValue().children.size() > 1) {
+                            nodes.push(next.getValue().children.entrySet().iterator());
+                        }
+                        current = next.getValue();
+                        return true;
+                    }
+                }
+                nodes.removeFirst();
+            }
+            return false;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nextString != null || advanceToNextString();
+        }
+
+        @Override
+        public String next() {
+            if (!hasNext()) throw new NoSuchElementException();
+
+            String s = nextString;
+            nextString = null;
+            return s;
+        }
+
+        @Override
+        public void remove() {
+            if (current == null) throw new IllegalStateException();
+
+            current.children.remove('\0');
+            size--;
+
+            // Подмена итератора, дабы не вызвать ConcurrentModificationException
+            if (!current.children.isEmpty()) {
+                nodes.removeFirst();
+                nodes.push(current.children.entrySet().iterator());
+            }
+            current = null;
+        }
+    }
 }

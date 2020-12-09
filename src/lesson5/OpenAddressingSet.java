@@ -1,10 +1,10 @@
 package lesson5;
 
-import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class OpenAddressingSet<T> extends AbstractSet<T> {
@@ -17,6 +17,8 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
 
     private int size = 0;
 
+    private final Object DELETED = new Object();
+
     private int startingIndex(Object element) {
         return element.hashCode() & (0x7FFFFFFF >> (31 - bits));
     }
@@ -27,6 +29,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         }
         this.bits = bits;
         capacity = 1 << bits;
+        System.out.println(capacity);
         storage = new Object[capacity];
     }
 
@@ -67,7 +70,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         int startingIndex = startingIndex(t);
         int index = startingIndex;
         Object current = storage[index];
-        while (current != null) {
+        while (current != null && current != DELETED) {
             if (current.equals(t)) {
                 return false;
             }
@@ -95,7 +98,19 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      */
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        int idx = startingIndex(o);
+        Object current = storage[idx];
+
+        while (current != null) {
+            if (current.equals(o)) {
+                storage[idx] = DELETED;
+                size--;
+                return true;
+            }
+            idx = (idx + 1) % capacity;
+            current = storage[idx];
+        }
+        return false;
     }
 
     /**
@@ -111,7 +126,55 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new OpenAddressingSetIterator();
+    }
+
+    private class OpenAddressingSetIterator implements Iterator<T> {
+        private int currentElementIndex;
+        private Object current;
+        private Object next;
+        private int idx;
+
+        private boolean advanceToNextElement() {
+            if (currentElementIndex == size()) {
+                return false;
+            }
+
+            while ((current = storage[idx]) == null || current == DELETED) {
+                idx++;
+            }
+
+            next = storage[idx];
+            idx++;
+            currentElementIndex++;
+            return true;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return next != null || advanceToNextElement();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public T next() {
+            if (!hasNext()) throw new NoSuchElementException();
+
+            T n = (T) next;
+            next = null;
+
+            return n;
+        }
+
+        @Override
+        public void remove() {
+            if (current == null) throw new IllegalStateException();
+
+            storage[idx - 1] = DELETED;
+            currentElementIndex--;
+            size--;
+
+            current = null;
+        }
     }
 }
