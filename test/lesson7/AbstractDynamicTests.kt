@@ -6,6 +6,7 @@ abstract class AbstractDynamicTests {
     fun longestCommonSubSequence(longestCommonSubSequence: (String, String) -> String) {
         assertEquals("", longestCommonSubSequence("мой мир", "я"))
         assertEquals("1", longestCommonSubSequence("1", "1"))
+        assertEquals("oot", lesson7.longestCommonSubSequence("foot", "ootto"))
         assertEquals("13", longestCommonSubSequence("123", "13"))
         assertEquals("здс", longestCommonSubSequence("здравствуй мир", "мы здесь"))
         assertEquals("emt ole", longestCommonSubSequence("nematode knowledge", "empty bottle"))
@@ -41,6 +42,16 @@ abstract class AbstractDynamicTests {
         assertEquals(listOf(), longestIncreasingSubSequence(listOf()))
         assertEquals(listOf(1), longestIncreasingSubSequence(listOf(1)))
         assertEquals(listOf(1, 2), longestIncreasingSubSequence(listOf(1, 2)))
+        assertEquals(listOf(2), longestIncreasingSubSequence(listOf(2, 1)))
+        assertEquals(emptyList(), longestIncreasingSubSequence(emptyList()));
+        assertEquals(
+            listOf(1, 2, 2, 4, 5, 7, 7, 8, 56, 56),
+            longestIncreasingSubSequence(
+                listOf(
+                    1, 2, 45, 34543, 342, 2, 4, 5, 7, 4, 7, 8, 5, 7, 4665, 56, 6, 56
+                )
+            )
+        )
         assertEquals(listOf(2), longestIncreasingSubSequence(listOf(2, 1)))
         assertEquals(
             listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
