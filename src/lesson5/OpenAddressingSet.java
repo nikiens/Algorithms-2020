@@ -96,6 +96,8 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Средняя
      */
+
+    // Time - O(1) - best, O(n) - worst
     @Override
     public boolean remove(Object o) {
         int idx = startingIndex(o);
@@ -150,11 +152,14 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             return true;
         }
 
+
+        // Time - O(1) - Best, O(n) - Worst
         @Override
         public boolean hasNext() {
             return next != null || advanceToNextElement();
         }
 
+        // Time - O(1) - Best, O(n) - Worst
         @SuppressWarnings("unchecked")
         @Override
         public T next() {
@@ -166,6 +171,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
             return n;
         }
 
+        // Time - O(1) - Best/Worst
         @Override
         public void remove() {
             if (current == null) throw new IllegalStateException();

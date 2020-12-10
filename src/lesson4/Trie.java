@@ -139,11 +139,13 @@ public class Trie extends AbstractSet<String> implements Set<String> {
             return false;
         }
 
+        // Time - O(1) - best; O()
         @Override
         public boolean hasNext() {
             return nextString != null || advanceToNextString();
         }
 
+        // Time - O(1) - best; O()
         @Override
         public String next() {
             if (!hasNext()) throw new NoSuchElementException();
@@ -153,10 +155,17 @@ public class Trie extends AbstractSet<String> implements Set<String> {
             return s;
         }
 
+        // Time - O(1) - best; O(1) - worst
         @Override
         public void remove() {
             if (current == null) throw new IllegalStateException();
 
+            /*
+              Тут, конечно, правильнее было бы удалять через итератор,
+              но тогда пришлось бы дополнительно итерироваться по детям
+              пока не попадем в элемент \0, ибо нет никакой гарантии,
+              что позиция итератора находится в нужном месте.
+             */
             current.children.remove('\0');
             size--;
 
